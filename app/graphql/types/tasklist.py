@@ -18,7 +18,7 @@ class TaskListType:
     created_at: datetime
     updated_at: datetime
 
-    tasks: list["TaskType"] | None
+    tasks: list["TaskType"] | None = None
 
 
 @sb.type
@@ -36,15 +36,15 @@ class TaskListBasicType:
 class TaskType:
     id: uuid.UUID
     title: str
-    description: str | None
+    description: str | None = None
     status: TaskStatus
     priority: TaskPriority
 
     created_at: datetime
     updated_at: datetime
 
-    tasklist: TaskListBasicType | None  # prevent recursion
-    assignee: UserType | None
+    tasklist: TaskListBasicType | None = None  # prevent recursion
+    assignee: UserType | None = None
 
 
 # Inputs for mutations

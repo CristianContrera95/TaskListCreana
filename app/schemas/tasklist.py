@@ -44,3 +44,4 @@ class TaskUpdateBody(BaseModel):
     description: str | None = None
     status: TaskStatus | None = None
     priority: TaskPriority | None = None
+    assignee_id: uuid.UUID | None = None

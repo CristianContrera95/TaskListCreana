@@ -5,9 +5,11 @@ import strawberry as sb
 from app.core.exceptions.database import NotFound
 from app.core.utils import apply_filter
 from app.crud.tasklist import TaskListCRUD, TaskCRUD
+from app.crud.user import UserCRUD
 from app.databases.database import get_async_session
 from app.graphql.types.tasklist import TaskListType, TaskType, TaskListCreateInput, TaskListUpdateInput, \
     TaskCreateInput, TaskUpdateInput, TaskListBasicType
+from app.graphql.types.user import UserType
 from app.models.tasklist import TaskStatus, TaskPriority
 from app.schemas.tasklist import TaskListCreateBody, TaskListUpdateBody, TaskUpdateBody, TaskCreateBody
 
@@ -71,9 +73,22 @@ class TaskListQuery:
         status: list[TaskStatus] | None = None,
         priority: list[TaskPriority] | None = None
     ) -> list[TaskListType]:
+
+        async def get_user(user_id: str) -> UserType | None:
+            user_crud = UserCRUD(session)
+            user = await user_crud.get_by_id(user_id)
+            if user:
+                return UserType(
+                    **user.model_dump(
+                        mode="json",
+                        exclude={"hashed_password", "updated_by", "created_by"})
+                )
+            return None
+
         result: list[TaskListType] = []
         async for session in get_async_session():
             crud = TaskListCRUD(session)
+
             tasklists = await crud.get_list()
 
             for tasklist in tasklists:
@@ -94,7 +109,7 @@ class TaskListQuery:
                         created_at=t.created_at,
                         updated_at=t.updated_at,
                         tasklist=t.tasklist,
-                        assignee=str(t.assignee_id) if t.assignee_id else None
+                        assignee=get_user(str(t.assignee_id)) if t.assignee_id else None
                     ) for t in tasks
                         if (
                             apply_filter(str(t.status.value), status) and
@@ -245,6 +260,7 @@ class TaskListMutation:
                     description=data.description,
                     status=data.status,
                     priority=data.priority,
+                    assignee_id=data.assignee_id,
                 )
             )
 

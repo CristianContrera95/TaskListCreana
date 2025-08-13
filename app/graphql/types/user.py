@@ -15,11 +15,11 @@ class TaskBasicType:
 @sb.type
 class UserType:
     id: uuid.UUID
-    title: UserTitle | None
+    title: UserTitle | None = None
     first_name: str
     last_name: str
     email: str
-    tasklist: list[TaskBasicType] | None
+    tasklist: list[TaskBasicType] | None = None
     created_at: datetime
     updated_at: datetime
 
