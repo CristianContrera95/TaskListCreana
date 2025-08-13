@@ -3,11 +3,12 @@ import uuid
 import strawberry as sb
 
 from app.core.exceptions.database import NotFound
+from app.core.utils import apply_filter
 from app.crud.tasklist import TaskListCRUD, TaskCRUD
 from app.databases.database import get_async_session
 from app.graphql.types.tasklist import TaskListType, TaskType, TaskListCreateInput, TaskListUpdateInput, \
     TaskCreateInput, TaskUpdateInput, TaskListBasicType
-from app.models.tasklist import TaskStatus, TaskList
+from app.models.tasklist import TaskStatus, TaskPriority
 from app.schemas.tasklist import TaskListCreateBody, TaskListUpdateBody, TaskUpdateBody, TaskCreateBody
 
 
@@ -15,7 +16,13 @@ from app.schemas.tasklist import TaskListCreateBody, TaskListUpdateBody, TaskUpd
 class TaskListQuery:
 
     @sb.field
-    async def get_tasklist(self, tasklist_id: sb.ID) -> TaskListType | None:
+    async def get_tasklist(
+        self,
+        tasklist_id: sb.ID,
+        status: list[TaskStatus] | None = None,
+        priority: list[TaskPriority] | None = None
+    ) -> TaskListType | None:
+
         async for session in get_async_session():
             crud = TaskListCRUD(session)
             tasklist = await crud.get_by_id(str(tasklist_id))
@@ -38,6 +45,10 @@ class TaskListQuery:
                     ),
                     assignee=str(t.assignee_id) if t.assignee_id else None
                 ) for t in tasks
+                    if (
+                        apply_filter(str(t.status.value), status) and
+                        apply_filter(str(t.priority.value), priority)
+                )
             ]
 
             percent = ((len(list(filter(
@@ -55,7 +66,11 @@ class TaskListQuery:
             )
 
     @sb.field
-    async def list_tasklists(self) -> list[TaskListType]:
+    async def list_tasklists(
+        self,
+        status: list[TaskStatus] | None = None,
+        priority: list[TaskPriority] | None = None
+    ) -> list[TaskListType]:
         result: list[TaskListType] = []
         async for session in get_async_session():
             crud = TaskListCRUD(session)
@@ -81,6 +96,10 @@ class TaskListQuery:
                         tasklist=t.tasklist,
                         assignee=str(t.assignee_id) if t.assignee_id else None
                     ) for t in tasks
+                        if (
+                            apply_filter(str(t.status.value), status) and
+                            apply_filter(str(t.priority.value), priority)
+                    )
                 ]
 
                 result.append(
