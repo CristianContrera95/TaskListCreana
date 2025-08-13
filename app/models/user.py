@@ -45,4 +45,7 @@ class User(BaseSQLModel, table=True):
 
     hashed_password: str
 
-    tasks: list["Task"] = Relationship(back_populates="assignee")  # type: ignore
+    tasks: list["Task"] = Relationship(
+        back_populates="assignee",
+        sa_relationship_kwargs={"foreign_keys": "[Task.assignee_id]"}
+    )  # type: ignore

@@ -1,3 +1,5 @@
+import uuid
+
 from pydantic import BaseModel
 
 from app.models.tasklist import TaskPriority, TaskStatus
@@ -30,6 +32,7 @@ class TaskCreateBody(BaseModel):
     description: str | None = None
     status: TaskStatus | None = TaskStatus.pending
     priority: TaskPriority | None = TaskPriority.medium
+    tasklist_id: uuid.UUID
 
 
 class TaskUpdateBody(BaseModel):

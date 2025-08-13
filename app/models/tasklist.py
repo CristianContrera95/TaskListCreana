@@ -26,9 +26,11 @@ class TaskList(BaseSQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
     title: str = Field(default="TaskList", max_length=255)
-    description: str | None = None
+    description: str | None = Field(default=None)
 
-    tasks: list["Task"] = Relationship(back_populates="todolist")
+    tasks: list["Task"] | None = Relationship(
+        back_populates="tasklist", cascade_delete=True
+    )
 
 
 class Task(BaseSQLModel, table=True):
@@ -55,9 +57,12 @@ class Task(BaseSQLModel, table=True):
     )
 
     tasklist_id: uuid.UUID = Field(
-        description="TaskList father", foreign_key="todolist.id"
+        description="TaskList father", foreign_key="task_lists.id"
     )
-    assignee_id: uuid.UUID | None = Field(default=None, foreign_key="user.id")
+    assignee_id: uuid.UUID | None = Field(default=None, foreign_key="users.id")
 
-    todolist: TaskList | None = Relationship(back_populates="tasks")
-    assignee: User | None = Relationship(back_populates="tasks")
+    tasklist: TaskList | None = Relationship(back_populates="tasks")
+    assignee: User | None = Relationship(
+        back_populates="tasks",
+        sa_relationship_kwargs={"foreign_keys": "[Task.assignee_id]"}
+    )

@@ -99,25 +99,25 @@ class AsyncCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         fields_to_exclude: set | None = None,
     ) -> ModelType | None:
         try:
-            db_obj = await self.get_by_id(db_obj_id)
-            if not db_obj:
-                raise NotFound(f"Not found {self.model.__name__}: with id: {db_obj_id}")
+            async with self.safe_transaction() as session:
+                db_obj = await self.get_by_id(db_obj_id)
+                if not db_obj:
+                    raise NotFound(f"Not found {self.model.__name__}: with id: {db_obj_id}")
 
-            obj_data = obj_updater.model_dump(
-                exclude=fields_to_exclude,
-                exclude_unset=True,
-                exclude_defaults=True,
-                exclude_none=True,
-            )
+                obj_data = obj_updater.model_dump(
+                    exclude=fields_to_exclude,
+                    exclude_unset=True,
+                    exclude_defaults=True,
+                    exclude_none=True,
+                )
 
-            for field, value in obj_data.items():
-                setattr(db_obj, field, value)
+                for field, value in obj_data.items():
+                    setattr(db_obj, field, value)
 
-            self.session.add(db_obj)
-            await self.session.flush()
-            await self.session.refresh(db_obj)
-            await self.session.commit()
-            return db_obj
+                session.add(db_obj)
+                await session.flush()
+                await session.refresh(db_obj)
+                return self.model(**db_obj.model_dump(mode="json"))
         except Exception as e:
             await self.session.rollback()
             logger.error(
@@ -151,22 +151,22 @@ class AsyncCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         result = await self.session.exec(stmt)  # type: ignore
         return result.one_or_none()
 
-    # async def get_list(
-    #         self, filters: BaseFilter | None = None, with_relations: bool = True
-    # ) -> list[ModelType]:
-    #     """
-    #     Use filters base from app.schemas.filters.base
-    #     or inherited class to apply filters
-    #     """
-    #     stmt = select(self.model)
-    #     if filters:
-    #         stmt = filters.apply(stmt)
-    #
-    #     stmt = self._add_relations(stmt) if with_relations else stmt
-    #
-    #     result = await self.session.exec(stmt)
-    #     return list(result.all()) if result is not None else []
-    #
+    async def get_list(
+            self, with_relations: bool = True
+    ) -> list[ModelType]:
+        """
+        Use filters base from app.schemas.filters.base
+        or inherited class to apply filters
+        """
+        stmt = select(self.model)
+        # if filters:
+        #     stmt = filters.apply(stmt)
+
+        stmt = self._add_relations(stmt) if with_relations else stmt
+
+        result = await self.session.exec(stmt)
+        return list(result.all()) if result is not None else []
+
     # async def count(self, filters: BaseFilter | None = None) -> int:
     #     stmt = select(func.count()).select_from(self.model)
     #     if filters:

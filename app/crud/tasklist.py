@@ -10,7 +10,7 @@ from app.schemas.tasklist import (
 
 class TaskListCRUD(AsyncCRUD[TaskList, TaskListCreateBody, TaskListUpdateBody]):
     def __init__(self, session):
-        super().__init__(Task, session)
+        super().__init__(TaskList, session)
 
 
 class TaskCRUD(AsyncCRUD[Task, TaskCreateBody, TaskUpdateBody]):

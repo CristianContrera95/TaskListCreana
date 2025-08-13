@@ -7,14 +7,29 @@ from app.graphql.types.user import UserType
 from app.models.tasklist import TaskPriority, TaskStatus
 
 
+# query types
 @sb.type
 class TaskListType:
     id: uuid.UUID
     title: str
-    description: str | None
+    description: str | None = None
+    completion_percent: int = 0
+
     created_at: datetime
     updated_at: datetime
+
     tasks: list["TaskType"] | None
+
+
+@sb.type
+class TaskListsType:
+    tasklists: list[TaskListType]
+
+
+@sb.type
+class TaskListBasicType:
+    id: uuid.UUID
+    title: str
 
 
 @sb.type
@@ -24,9 +39,11 @@ class TaskType:
     description: str | None
     status: TaskStatus
     priority: TaskPriority
+
     created_at: datetime
     updated_at: datetime
-    todolist: TaskListType | None
+
+    tasklist: TaskListBasicType | None  # prevent recursion
     assignee: UserType | None
 
 
@@ -37,6 +54,7 @@ class TaskCreateInput:
     description: str | None = None
     status: TaskStatus = TaskStatus.pending
     priority: TaskPriority = TaskPriority.medium
+
     tasklist_id: uuid.UUID
     assignee_id: uuid.UUID | None = None
 
@@ -47,6 +65,7 @@ class TaskUpdateInput:
     description: str | None = None
     status: TaskStatus | None = None
     priority: TaskPriority | None = None
+
     tasklist_id: uuid.UUID | None = None
     assignee_id: uuid.UUID | None = None
 
