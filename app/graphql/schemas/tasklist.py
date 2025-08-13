@@ -15,10 +15,6 @@ from app.schemas.tasklist import TaskListCreateBody, TaskListUpdateBody, TaskUpd
 class TaskListQuery:
 
     @sb.field
-    def hello(self) -> str:
-        return "hello world!"
-
-    @sb.field
     async def get_tasklist(self, tasklist_id: sb.ID) -> TaskListType | None:
         async for session in get_async_session():
             crud = TaskListCRUD(session)
@@ -259,6 +255,3 @@ class TaskListMutation:
                 raise NotFound(f"Task with id: {id_} not found")
             return r
         return False
-
-
-schema = sb.Schema(query=TaskListQuery, mutation=TaskListMutation)
