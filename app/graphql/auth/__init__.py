@@ -1,9 +1,9 @@
 import uuid
 
-from fastapi import Request, Depends
+from fastapi import Depends, Request
 from strawberry.fastapi.context import BaseContext
 
-from app.api.dependencies.auth import oauth2_scheme, get_current_user_from_token
+from app.api.dependencies.auth import get_current_user_from_token, oauth2_scheme
 from app.core.exceptions.auth import InvalidAccessToken, UserNotFound
 from app.crud.user import UserCRUD
 
@@ -21,7 +21,7 @@ async def context_dependency(request: Request) -> Context:
     try:
         token = await oauth2_scheme(request)
         user_id = get_current_user_from_token(token)
-    except Exception as ex:
+    except Exception:
         pass
 
     return Context(request=request, user_id=user_id)

@@ -64,5 +64,5 @@ class Task(BaseSQLModel, table=True):
     tasklist: TaskList | None = Relationship(back_populates="tasks")
     assignee: User | None = Relationship(
         back_populates="tasks",
-        sa_relationship_kwargs={"foreign_keys": "[Task.assignee_id]"}
+        sa_relationship_kwargs={"foreign_keys": "[Task.assignee_id]"},
     )

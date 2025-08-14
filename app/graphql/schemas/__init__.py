@@ -1,7 +1,7 @@
 import strawberry as sb
 
+from app.graphql.schemas.tasklist import TaskListMutation, TaskListQuery
 from app.graphql.schemas.user import UserQuery
-from app.graphql.schemas.tasklist import TaskListQuery, TaskListMutation
 
 
 @sb.type

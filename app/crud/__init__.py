@@ -102,7 +102,9 @@ class AsyncCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             async with self.safe_transaction() as session:
                 db_obj = await self.get_by_id(db_obj_id)
                 if not db_obj:
-                    raise NotFound(f"Not found {self.model.__name__}: with id: {db_obj_id}")
+                    raise NotFound(
+                        f"Not found {self.model.__name__}: with id: {db_obj_id}"
+                    )
 
                 obj_data = obj_updater.model_dump(
                     exclude=fields_to_exclude,
@@ -151,9 +153,7 @@ class AsyncCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         result = await self.session.exec(stmt)  # type: ignore
         return result.one_or_none()
 
-    async def get_list(
-            self, with_relations: bool = True
-    ) -> list[ModelType]:
+    async def get_list(self, with_relations: bool = True) -> list[ModelType]:
         """
         Use filters base from app.schemas.filters.base
         or inherited class to apply filters

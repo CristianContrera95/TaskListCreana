@@ -1,11 +1,10 @@
-
 import strawberry as sb
 
-from app.core.exceptions.auth import InvalidAccessToken, UserNotFound
+from app.core.exceptions.auth import InvalidAccessToken
 from app.crud.user import UserCRUD
 from app.databases.database import get_async_session
-from app.graphql.auth import Context, validate_auth_user
-from app.graphql.types.user import UserType, TaskBasicType
+from app.graphql.auth import Context
+from app.graphql.types.user import TaskBasicType, UserType
 
 
 @sb.type
@@ -28,7 +27,7 @@ class UserQuery:
                 email=user.email,
                 tasklist=None,
                 created_at=user.created_at,
-                updated_at=user.updated_at
+                updated_at=user.updated_at,
             )
 
     @sb.field
@@ -44,7 +43,8 @@ class UserQuery:
                 TaskBasicType(
                     id=str(t.id),
                     title=t.title,
-                ) for t in tasks
+                )
+                for t in tasks
             ]
 
             return UserType(
@@ -55,7 +55,7 @@ class UserQuery:
                 email=user.email,
                 tasklist=tasks_out,
                 created_at=user.created_at,
-                updated_at=user.updated_at
+                updated_at=user.updated_at,
             )
 
     @sb.field
@@ -74,18 +74,20 @@ class UserQuery:
                     TaskBasicType(
                         id=str(t.id),
                         title=t.title,
-                    ) for t in tasks
+                    )
+                    for t in tasks
                 ]
 
-                result.append(UserType(
-                    id=str(user.id),
-                    title=user.title,
-                    first_name=user.first_name,
-                    last_name=user.last_name,
-                    email=user.email,
-                    tasklist=tasks_out,
-                    created_at=user.created_at,
-                    updated_at=user.updated_at
-                ))
+                result.append(
+                    UserType(
+                        id=str(user.id),
+                        title=user.title,
+                        first_name=user.first_name,
+                        last_name=user.last_name,
+                        email=user.email,
+                        tasklist=tasks_out,
+                        created_at=user.created_at,
+                        updated_at=user.updated_at,
+                    )
+                )
         return result
-

@@ -47,5 +47,5 @@ class User(BaseSQLModel, table=True):
 
     tasks: list["Task"] = Relationship(
         back_populates="assignee",
-        sa_relationship_kwargs={"foreign_keys": "[Task.assignee_id]"}
+        sa_relationship_kwargs={"foreign_keys": "[Task.assignee_id]"},
     )  # type: ignore

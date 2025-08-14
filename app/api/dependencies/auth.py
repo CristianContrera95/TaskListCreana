@@ -1,5 +1,5 @@
-import uuid
 import os
+import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
@@ -13,7 +13,6 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.exceptions.auth import InvalidAccessToken
 from app.models.user import User
-
 
 SECRET_KEY = os.getenv("SECRET_KEY", "Hire me with a good salary please")
 ALGORITHM = "HS256"
@@ -74,6 +73,7 @@ def get_current_user_from_token(token: str) -> uuid.UUID | None:
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     return get_current_user_from_token(token=token)
+
 
 # To use at REST endpoints
 UserDepends = Annotated[User, Depends(get_current_user)]
