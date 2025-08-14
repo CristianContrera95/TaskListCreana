@@ -43,6 +43,50 @@ This project is the GraphQL version of the Todo challenge using:
    ```
 3. Open GraphQL playground at `http://localhost:8000/graphql`.
 
+
+## Usage
+At `http://localhost:8000/docs` you'll find Swagger REST-API with two endpoint :
+
+1. `POST /api/v1/admin` to create a new user to login at API.  
+   - CURL example
+```bash
+   curl -X 'POST' \
+  'http://127.0.0.1:8000/api/v1/admin' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "title": "Mr",
+  "first_name": "pepe",
+  "last_name": "lui",
+  "email": "pepe@lui.com",
+  "password": "strong"
+}'
+```
+
+2. `POST /api/v1/admin/token` to generate a new token using email and password  
+   - CURL example:
+```bash
+  curl -X 'POST' \
+  'http://127.0.0.1:8000/api/v1/admin/token' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=password&username=pepe%40lui.com&password=strong&scope=&client_id=string&client_secret=********'
+```
+
+3. With your token like this:
+```
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi....j6_bw",
+  "token_type": "bearer"
+}
+```
+Go to `http://localhost:8000/graphql` and set authorization headers at the bottom of the web page
+```
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOi....j6_bw"
+}
+```
+4. Now yo can make any Query or Mutation. Without Authentication only can try Query Endpoints
 ---
 
 Developers:
