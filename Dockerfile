@@ -5,8 +5,9 @@ WORKDIR /app
 RUN pip install uv
 
 COPY uv.lock .
+COPY pyproject.toml .
 
-RUN uv sync --system-site-packages
+RUN uv sync
 
 #--------------------
 FROM python:3.11-slim

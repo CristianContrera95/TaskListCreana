@@ -19,6 +19,3 @@ async def init_db():
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSession(async_engine) as session:
         yield session
-
-
-init_db()
