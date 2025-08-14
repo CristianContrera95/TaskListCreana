@@ -40,3 +40,15 @@ This project is the GraphQL version of the Todo challenge using:
    ```
 3. Open GraphQL playground at `http://localhost:8000/graphql`.
 
+---
+
+Developers:
+
+To contribute to this project, use a new branch for each feature o bugfix and do the pre-commits by your self, 
+we trust in you!!! don't forget that!! 
+```bash
+   make format
+   make lint
+   git add .
+   git commit -m "here your aport"
+```
