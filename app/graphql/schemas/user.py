@@ -1,6 +1,7 @@
 import strawberry as sb
 
 from app.core.exceptions.auth import InvalidAccessToken
+from app.core.exceptions.graphql import InvalidRequest
 from app.crud.user import UserCRUD
 from app.databases.database import get_async_session
 from app.graphql.auth import Context
@@ -33,6 +34,8 @@ class UserQuery:
     @sb.field
     async def get_user(self, user_id: sb.ID) -> UserType | None:
         async for session in get_async_session():
+            if not user_id:
+                raise InvalidRequest(f"Must specify a user ID.")
             crud = UserCRUD(session)
             user = await crud.get_by_id(str(user_id))
             if not user:

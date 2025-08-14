@@ -7,7 +7,8 @@ This project is the GraphQL version of the Todo challenge using:
 
 ## Quickstart:
 ### Docker
-1. Copy `.env` to root folder and set values.
+1. Copy `.env` to root folder and set values.  
+   - Nota: Check enviroment variable POSTGRES_SERVER is set to use with Docker
 2. Run with Docker Compose:
    ```bash
    docker compose up --build
@@ -20,12 +21,14 @@ This project is the GraphQL version of the Todo challenge using:
    uv venv
    uv sync
    ```
-1. Copy `.env` to root folder and set values.
-2. Run with Docker Compose:
+1. Copy `.env` to root folder and set values.  
+   - Nota: Check enviroment variable POSTGRES_SERVER is set to use with localhost
+2. Set Up local PostGrestDB look at script folder
+3. Run with Serve:
    ```bash
    make serve
    ```
-3. Open GraphQL playground at `http://localhost:8000/graphql`.
+4. Open GraphQL playground at `http://localhost:8000/graphql`.
 
 ### Test
 0. Install uv and run:

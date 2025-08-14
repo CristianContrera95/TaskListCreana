@@ -26,14 +26,6 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
 
-    SMTP_SERVER: str
-    SMTP_PORT: int
-    SMTP_USER: str
-    SMTP_PASSWORD: str
-
-    SMTP_FROM: str
-    SMTP_FROM_NAME: str
-
     @computed_field
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> MultiHostUrl:

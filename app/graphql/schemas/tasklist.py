@@ -3,6 +3,7 @@ import uuid
 import strawberry as sb
 
 from app.core.exceptions.database import NotFound
+from app.core.exceptions.graphql import InvalidRequest
 from app.core.utils import apply_filter
 from app.crud.tasklist import TaskCRUD, TaskListCRUD
 from app.crud.user import UserCRUD
@@ -37,6 +38,9 @@ class TaskListQuery:
         status: list[TaskStatus] | None = None,
         priority: list[TaskPriority] | None = None,
     ) -> TaskListType | None:
+
+        if not tasklist_id:
+            raise InvalidRequest(f"Must specify a tasklist ID.")
 
         async for session in get_async_session():
             crud = TaskListCRUD(session)
@@ -200,6 +204,10 @@ class TaskListMutation:
     async def update_tasklist(
         self, tasklist_id: uuid.UUID, data: TaskListUpdateInput, info: sb.Info[Context]
     ) -> TaskListType | None:
+
+        if not tasklist_id:
+            raise InvalidRequest(f"Must specify a tasklist ID.")
+
         async for session in get_async_session():
             await validate_auth_user(session, info.context)
             crud = TaskListCRUD(session)
@@ -245,6 +253,10 @@ class TaskListMutation:
 
     @sb.mutation
     async def delete_tasklist(self, id_: str, info: sb.Info[Context]) -> bool:
+
+        if not id_:
+            raise InvalidRequest(f"Must specify a tasklist ID.")
+
         async for session in get_async_session():
             await validate_auth_user(session, info.context)
             crud = TaskListCRUD(session)
@@ -292,6 +304,10 @@ class TaskListMutation:
     async def update_task(
         self, task_id: uuid.UUID, data: TaskUpdateInput, info: sb.Info[Context]
     ) -> TaskType | None:
+
+        if not task_id:
+            raise InvalidRequest(f"Must specify a task ID.")
+
         async for session in get_async_session():
             await validate_auth_user(session, info.context)
             crud = TaskCRUD(session)
@@ -323,6 +339,10 @@ class TaskListMutation:
 
     @sb.mutation
     async def delete_task(self, id_: str, info: sb.Info[Context]) -> bool:
+
+        if not id_:
+            raise InvalidRequest(f"Must specify a task ID.")
+
         async for session in get_async_session():
             await validate_auth_user(session, info.context)
             crud = TaskCRUD(session)
