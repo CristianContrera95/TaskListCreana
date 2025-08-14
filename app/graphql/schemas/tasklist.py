@@ -9,6 +9,7 @@ from app.crud.user import UserCRUD
 from app.databases.database import get_async_session
 from app.graphql.types.tasklist import TaskListType, TaskType, TaskListCreateInput, TaskListUpdateInput, \
     TaskCreateInput, TaskUpdateInput, TaskListBasicType
+from app.graphql.auth import Context, validate_auth_user
 from app.graphql.types.user import UserType
 from app.models.tasklist import TaskStatus, TaskPriority
 from app.schemas.tasklist import TaskListCreateBody, TaskListUpdateBody, TaskUpdateBody, TaskCreateBody
@@ -136,8 +137,11 @@ class TaskListMutation:
 
     # -------- TaskList mutations --------
     @sb.mutation
-    async def create_tasklist(self, data: TaskListCreateInput) -> TaskListType | None:
+    async def create_tasklist(
+            self, data: TaskListCreateInput, info: sb.Info[Context]
+    ) -> TaskListType | None:
         async for session in get_async_session():
+            await validate_auth_user(session, info.context)
             crud = TaskListCRUD(session)
             created = await crud.create(
                 TaskListCreateBody(
@@ -161,9 +165,13 @@ class TaskListMutation:
 
     @sb.mutation
     async def update_tasklist(
-            self, tasklist_id: uuid.UUID, data: TaskListUpdateInput
+            self,
+            tasklist_id: uuid.UUID,
+            data: TaskListUpdateInput,
+            info: sb.Info[Context]
     ) -> TaskListType | None:
         async for session in get_async_session():
+            await validate_auth_user(session, info.context)
             crud = TaskListCRUD(session)
             updated = await crud.update_by_id(
                 tasklist_id,
@@ -208,9 +216,9 @@ class TaskListMutation:
             )
 
     @sb.mutation
-    async def delete_tasklist(self, id_: str) -> bool:
+    async def delete_tasklist(self, id_: str, info: sb.Info[Context]) -> bool:
         async for session in get_async_session():
-
+            await validate_auth_user(session, info.context)
             crud = TaskListCRUD(session)
             r = await crud.delete_by_id(uuid.UUID(id_))
 
@@ -221,8 +229,9 @@ class TaskListMutation:
 
     # -------- Task mutations --------
     @sb.mutation
-    async def create_task(self, data: TaskCreateInput) -> TaskType | None:
+    async def create_task(self, data: TaskCreateInput, info: sb.Info[Context]) -> TaskType | None:
         async for session in get_async_session():
+            await validate_auth_user(session, info.context)
             crud = TaskCRUD(session)
             created = await crud.create(
                 TaskCreateBody(
@@ -250,8 +259,9 @@ class TaskListMutation:
             )
 
     @sb.mutation
-    async def update_task(self, task_id: uuid.UUID, data: TaskUpdateInput) -> TaskType | None:
+    async def update_task(self, task_id: uuid.UUID, data: TaskUpdateInput, info: sb.Info[Context]) -> TaskType | None:
         async for session in get_async_session():
+            await validate_auth_user(session, info.context)
             crud = TaskCRUD(session)
             updated = await crud.update_by_id(
                 task_id,
@@ -280,9 +290,9 @@ class TaskListMutation:
             )
 
     @sb.mutation
-    async def delete_task(self, id_: str) -> bool:
+    async def delete_task(self, id_: str, info: sb.Info[Context]) -> bool:
         async for session in get_async_session():
-
+            await validate_auth_user(session, info.context)
             crud = TaskCRUD(session)
             r = await crud.delete_by_id(uuid.UUID(id_))
 

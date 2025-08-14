@@ -1,3 +1,4 @@
+import uuid
 import os
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
@@ -12,6 +13,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.exceptions.auth import InvalidAccessToken
 from app.models.user import User
+
 
 SECRET_KEY = os.getenv("SECRET_KEY", "Hire me with a good salary please")
 ALGORITHM = "HS256"
@@ -48,7 +50,7 @@ def decode_token(token: str):
 async def get_user_by_email(session: AsyncSession, email: str) -> User | None:
     stmt = select(User).where(col(User.email) == email)
     result = await session.exec(stmt)
-    return result.first()
+    return result.one_or_none()[0]
 
 
 async def authenticate_user(
@@ -57,7 +59,7 @@ async def authenticate_user(
     user = await get_user_by_email(session, email)
     if not user:
         return None
-    if not await verify_password(password, user.hashed_password):
+    if not verify_password(password, user.hashed_password):
         return None
     return user
 
@@ -65,9 +67,13 @@ async def authenticate_user(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+def get_current_user_from_token(token: str) -> uuid.UUID | None:
     data = decode_token(token)
-    return User(**data)
+    return data["sub"]
 
 
+def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+    return get_current_user_from_token(token=token)
+
+# To use at REST endpoints
 UserDepends = Annotated[User, Depends(get_current_user)]
